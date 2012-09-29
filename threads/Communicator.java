@@ -38,4 +38,5 @@ public class Communicator {
     public int listen() {
 	return 0;
     }
+    boolean isEmpty;
 }
