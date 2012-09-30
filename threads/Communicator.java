@@ -14,8 +14,14 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
+        isEmpty = true
+        spCV = new Condition2();
+        ltCV = new Condition2();
+        returnCV = new Condition2();
+        communicatorLock = new Lock();
+        
     }
-
+    
     /**
      * Wait for a thread to listen through this communicator, and then transfer
      * <i>word</i> to the listener.
@@ -27,6 +33,18 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int word) {
+        communicatorLock.acquire();
+        if (isEmpty == false ){
+            ltCV.wake();
+            spCV.sleep();            
+        }
+        
+        this.data = word;
+        isEmpty = false;
+        ltCV.wake();
+        returnCV.sleep();
+        communicatorLock.release();
+        
     }
 
     /**
@@ -36,6 +54,24 @@ public class Communicator {
      * @return	the integer transferred.
      */    
     public int listen() {
-	return 0;
+        int dataToreturn;
+        communicatorLock.acquire();
+        if (isEmpty == true){
+            spCV.wake();
+            ltCV.sleep();
+            //retrun 0; not sure yet
+        }
+        dataToreturn = data;
+        isEmpty = true;
+        returnCV.wake();
+        communicatorLock.release();
+        return data;
     }
+    
+    private boolean isEmpty;
+    private Condition2 spCV;
+    private Condition2 ltCV;
+    private Condition2 returnCV;
+    private int data;
+    private Lock communicatorLock;
 }
