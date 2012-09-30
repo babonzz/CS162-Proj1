@@ -190,13 +190,14 @@ public class KThread {
 
 	Lib.assertTrue(toBeDestroyed == null);
 	toBeDestroyed = currentThread;
-
-
+	
+	if(parentThread.nextThread()!=null)
+		parentThread.nextThread().ready();
+	
 	currentThread.status = statusFinished;
 	
 	sleep();
     }
-
     /**
      * Relinquish the CPU if any other thread is ready to run. If so, put the
      * current thread on the ready queue, so that it will eventually be
@@ -272,10 +273,22 @@ public class KThread {
      * call is not guaranteed to return. This thread must not be the current
      * thread.
      */
+    public int calledBefore = 0;
+    public ThreadQueue parentThread = ThreadedKernel.scheduler.newThreadQueue(true);//enable priority transfer
     public void join() {
-	Lib.debug(dbgThread, "Joining to thread: " + toString());
-
-	Lib.assertTrue(this != currentThread);
+		Lib.debug(dbgThread, "Joining to thread: " + toString());
+		Lib.assertTrue(this != currentThread);
+		if(calledBefore==0){
+			calledBefore = 1;
+			if(status = statusFinished)
+				return;
+			 Machine.interrupt().disable();
+			 parentThread.waitForAccess(currentThread);
+			 currentThread.sleep();
+			 ready();
+			 Machine.interrupt().enable();
+		}//end if
+		
 
     }
 
