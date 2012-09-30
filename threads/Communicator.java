@@ -33,8 +33,10 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int word) {
+        System.out.println("["+Machine.timer().getTime()+"]"+"["+KThread.currentThread()+"]is speaking now. speak("+word+")");
         communicatorLock.acquire();
         if (isEmpty == false ){
+             System.out.println("["+Machine.timer().getTime()+"]"+"["+KThread.currentThread()+"]is need to wait for listen. can not speak yet");
             ltCV.wake();
             spCV.sleep();            
         }
@@ -44,6 +46,7 @@ public class Communicator {
         ltCV.wake();
         returnCV.sleep();
         communicatorLock.release();
+         System.out.println("["+Machine.timer().getTime()+"]"+"["+KThread.currentThread()+ " speak has been complete. ");
         
     }
 
@@ -55,8 +58,10 @@ public class Communicator {
      */    
     public int listen() {
         int dataToreturn;
+         System.out.println("["+Machine.timer().getTime()+"]"+"["+KThread.currentThread()+"]is listening now. ");
         communicatorLock.acquire();
         if (isEmpty == true){
+             System.out.println("["+Machine.timer().getTime()+"]"+"["+KThread.currentThread()+"] need to wait for speak. can not listen yet.");
             spCV.wake();
             ltCV.sleep();
             //retrun 0; not sure yet
@@ -65,7 +70,12 @@ public class Communicator {
         isEmpty = true;
         returnCV.wake();
         communicatorLock.release();
-        return data;
+         System.out.println("["+Machine.timer().getTime()+"]"+"["+KThread.currentThread()+"] listen has been completed. the word that has spoken is " + dataToreturn);
+        return dataToreturn;
+    }
+    
+    public static void selfTest(){
+        
     }
     
     private boolean isEmpty;
