@@ -2,6 +2,8 @@ package nachos.threads;
 
 import nachos.machine.*;
 
+import java.util.LinkedList;
+
 /**
  * An implementation of condition variables that disables interrupt()s for
  * synchronization.
@@ -22,17 +24,17 @@ public class Condition2 {
      *				<tt>wake()</tt>, or <tt>wakeAll()</tt>.
      */
     public Condition2(Lock conditionLock) {
-	this.conditionLock = conditionLock;
-	waitQueue = new LinkedList<KThread>();
+        this.conditionLock = conditionLock;
+        waitQueue = new LinkedList<KThread>();
     }
-  //===================================================================
+    //===================================================================
     /**
      * Atomically release the associated lock and go to sleep on this condition
      * variable until another thread wakes it using <tt>wake()</tt>. The
      * current thread must hold the associated lock. The thread will
      * automatically reacquire the lock before <tt>sleep()</tt> returns.
      */
-
+    
 	
     public void sleep() {
 		Lib.assertTrue(conditionLock.isHeldByCurrentThread());
@@ -45,9 +47,9 @@ public class Condition2 {
 		conditionLock.acquire();
 		
 		Machine.interrupt().enable();
-	
+        
     }
-//===================================================================
+    //===================================================================
     /**
      * Wake up at most one thread sleeping on this condition variable. The
      * current thread must hold the associated lock.
@@ -61,19 +63,19 @@ public class Condition2 {
 		
 		Machine.interrupt().enable();
     }
-  //===================================================================
+    //===================================================================
     /**
      * Wake up all threads sleeping on this condition variable. The current
      * thread must hold the associated lock.
      */
     public void wakeAll() {
-	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+        Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 		Machine.interrupt().disable();
 		while(!waitQueue.isEmpty())
 			((KThread) waitQueue.removeFirst()).ready();
 		Machine.interrupt().enable();
     }
-  //===================================================================
+    //===================================================================
     private Lock conditionLock;
     private LinkedList<KThread> waitQueue;
 }
