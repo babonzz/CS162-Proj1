@@ -2,6 +2,8 @@ package nachos.threads;
 
 import nachos.machine.*;
 
+import java.util.ArrayList;
+
 /**
  * Uses the hardware timer to provide preemption, and to allow threads to sleep
  * until a certain time.
@@ -17,8 +19,8 @@ public class Alarm {
      */
 	
     public Alarm() {
-	Machine.timer().setInterruptHandler(new Runnable() {
-		public void run() { timerInterrupt(); }
+        Machine.timer().setInterruptHandler(new Runnable() {
+            public void run() { timerInterrupt(); }
 	    });
     }
     
@@ -35,11 +37,11 @@ public class Alarm {
     }
     
     //an array to store all threads that have called waitUntil()
-    private ArrayList<KThread> Listofthreads = new ArrayList<KThread>();
+    private ArrayList<Entryitem> Listofthreads = new ArrayList<Entryitem>();
     
     
     
-  //===================================================================
+    //===================================================================
     /**
      * The timer interrupt handler. This is called by the machine's timer
      * periodically (approximately every 500 clock ticks). Causes the current
@@ -48,7 +50,7 @@ public class Alarm {
      */
     
     public void timerInterrupt() {
-    	int currTime = Machine.timer().getTime();
+    	long currTime = Machine.timer().getTime();
     	
     	for(Entryitem eachitem : Listofthreads){
     		if(eachitem.theWakeTime < currTime){
@@ -56,9 +58,9 @@ public class Alarm {
     			Listofthreads.remove(eachitem);
     		}//end if
     	}//end for
-    
+        
     	KThread.currentThread().yield();
-
+        
     	
     }
     //===================================================================
@@ -76,12 +78,12 @@ public class Alarm {
      *
      * @see	nachos.machine.Timer#getTime()
      */
-
+    
     public void waitUntil(long x) {
 		// for now, cheat just to get something working (busy waiting is bad)
 		//long wakeTime = Machine.timer().getTime() + x;
 		//while (wakeTime > Machine.timer().getTime())
-		   // KThread.yield();
+        // KThread.yield();
 		
 		Machine.interrupt().disable();
 		
@@ -90,7 +92,7 @@ public class Alarm {
 		
 		Machine.interrupt().enable();
     }
-  //===================================================================
+    //===================================================================
     
     
 }
