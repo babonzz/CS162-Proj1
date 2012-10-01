@@ -275,13 +275,13 @@ public class KThread {
      * thread.
      */
     public int calledBefore = 0;
-    public ThreadQueue parentThread = ThreadedKernel.scheduler.newThreadQueue(true);//enable priority transfer
+    public static ThreadQueue parentThread = ThreadedKernel.scheduler.newThreadQueue(true);//enable priority transfer
     public void join() {
 		Lib.debug(dbgThread, "Joining to thread: " + toString());
 		Lib.assertTrue(this != currentThread);
 		if(calledBefore==0){
 			calledBefore = 1;
-			if(status = statusFinished)
+			if(status == statusFinished)
 				return;
 			 Machine.interrupt().disable();
 			 parentThread.waitForAccess(currentThread);
